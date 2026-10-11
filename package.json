@@ -1,0 +1,13 @@
+{
+  "name": "pixelforge",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "test": "npm run test --workspaces --if-present",
+    "start": "npm start --workspace @pixelforge/app"
+  }
+}

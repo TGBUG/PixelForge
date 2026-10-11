@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'"
+    />
+    <title>PixelForge</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #14161a;
+        --panel: #1c1f26;
+        --border: #2a2f3a;
+        --text: #e6e9ef;
+        --muted: #8b93a3;
+        --accent: #4f8cff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: "Segoe UI", system-ui, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        font-size: 14px;
+      }
+      header {
+        padding: 18px 24px;
+        border-bottom: 1px solid var(--border);
+      }
+      header h1 { margin: 0; font-size: 18px; font-weight: 600; }
+      header p { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
+      main { padding: 20px 24px; }
+      .plugin-list { display: grid; gap: 10px; }
+      .plugin {
+        text-align: left;
+        padding: 14px 16px;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        color: inherit;
+        font: inherit;
+        cursor: pointer;
+      }
+      .plugin:hover { border-color: var(--accent); }
+      .plugin .name { font-weight: 600; }
+      .plugin .desc { color: var(--muted); margin-top: 4px; }
+      .meta { color: var(--muted); font-size: 12px; margin-top: 6px; }
+      .empty {
+        border: 1px dashed var(--border);
+        border-radius: 8px;
+        padding: 40px;
+        text-align: center;
+        color: var(--muted);
+      }
+      .warnings { margin-top: 18px; color: #e0a458; font-size: 12px; }
+      .warnings ul { margin: 6px 0 0; padding-left: 18px; }
+      .back {
+        background: none;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        color: var(--muted);
+        padding: 6px 12px;
+        cursor: pointer;
+        font: inherit;
+      }
+      .back:hover { color: var(--text); border-color: var(--accent); }
+      .detail h2 { margin: 16px 0 4px; font-size: 20px; }
+      dl { display: grid; grid-template-columns: 100px 1fr; gap: 6px 16px; margin: 18px 0 0; }
+      dt { color: var(--muted); }
+      dd { margin: 0; }
+      .note { margin-top: 24px; color: var(--muted); font-size: 12px; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>PixelForge</h1>
+      <p>图像处理工具箱 — 选择一个插件开始</p>
+    </header>
+    <main id="view"></main>
+    <script type="module" src="renderer.js"></script>
+  </body>
+</html>

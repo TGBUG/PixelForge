@@ -1,0 +1,32 @@
+{
+  "manifestVersion": 1,
+  "id": "hello-tint",
+  "name": "Hello Tint（示例·着色）",
+  "version": "0.1.0",
+  "author": {
+    "name": "PixelForge",
+    "contact": "dev@pixelforge.local"
+  },
+  "description": "夹具插件：把输入图整体染成一种颜色，用于开发与测试。",
+  "entry": "index.js",
+  "params": [
+    {
+      "key": "image",
+      "type": "file",
+      "label": "底图",
+      "description": "要被着色的图片。",
+      "required": true,
+      "accept": [".png", ".jpg", ".jpeg"]
+    },
+    {
+      "key": "strength",
+      "type": "range",
+      "label": "强度",
+      "description": "着色混合强度。",
+      "default": 0.5,
+      "min": 0,
+      "max": 1,
+      "step": 0.1
+    }
+  ]
+}

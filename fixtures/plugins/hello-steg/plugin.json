@@ -1,0 +1,30 @@
+{
+  "manifestVersion": 1,
+  "id": "hello-steg",
+  "name": "Hello Steg（示例·双图）",
+  "version": "0.2.0",
+  "author": {
+    "name": "PixelForge",
+    "contact": "dev@pixelforge.local"
+  },
+  "description": "夹具插件：把里图藏进表图的双图方法，用于开发与测试。",
+  "entry": "index.js",
+  "params": [
+    {
+      "key": "cover",
+      "type": "file",
+      "label": "表图",
+      "description": "承载隐藏信息的图片。",
+      "required": true,
+      "accept": [".png"]
+    },
+    {
+      "key": "secret",
+      "type": "file",
+      "label": "里图",
+      "description": "要被隐藏的图片。",
+      "required": true,
+      "accept": [".png"]
+    }
+  ]
+}
