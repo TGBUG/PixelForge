@@ -4,6 +4,7 @@ import fsp from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { isInside } from './path-utils.js';
 import { resolveParams } from './params.js';
 
 const LOADER = fileURLToPath(new URL('./plugin-loader.js', import.meta.url));
@@ -30,11 +31,6 @@ function cancelledResult(workdir) {
     outputs: [],
     error: { kind: 'cancelled', message: '运行已取消' },
   };
-}
-
-function isInside(parent, child) {
-  const relative = path.relative(parent, child);
-  return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
 }
 
 function safeSegment(value) {

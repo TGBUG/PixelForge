@@ -7,6 +7,7 @@ const state = {
   plugin: null,
   values: {},
   run: null,
+  notice: null,
 };
 
 // References to the live run panel, so log/progress events update in place.
@@ -26,10 +27,19 @@ function blankRun() {
 function renderList() {
   view.replaceChildren();
   ui = null;
-  const { plugins, errors } = state;
+  const { plugins, errors, notice } = state;
+
+  if (notice) view.append(el('div', 'notice', notice));
+
+  const toolbar = el('div', 'toolbar');
+  const installButton = el('button', 'primary', '安装插件…');
+  installButton.type = 'button';
+  installButton.addEventListener('click', installFromDialog);
+  toolbar.append(installButton);
+  view.append(toolbar);
 
   if (plugins.length === 0) {
-    view.append(el('div', 'empty', '还没有任何插件。把插件包放进插件目录后回到这里。'));
+    view.append(el('div', 'empty', '还没有任何插件。点「安装插件…」导入一个插件 ZIP。'));
     return;
   }
 
@@ -61,7 +71,57 @@ function openPlugin(plugin) {
   state.plugin = plugin;
   state.values = {};
   state.run = blankRun();
+  state.notice = null;
   renderPlugin();
+}
+
+async function refreshPlugins() {
+  const { plugins, errors } = await api.listPlugins();
+  state.plugins = plugins;
+  state.errors = errors;
+  renderList();
+}
+
+async function installFromDialog() {
+  const zipPath = await api.pickZip();
+  if (zipPath) await installZip(zipPath);
+}
+
+async function installZip(zipPath) {
+  try {
+    const result = await api.installPlugin(zipPath);
+    state.notice =
+      result.status === 'installed'
+        ? `已安装：${result.id} v${result.version}`
+        : `安装失败：${result.message}`;
+    await refreshPlugins();
+    return result;
+  } catch (error) {
+    const message = String(error?.message || error);
+    state.notice = `安装失败：${message}`;
+    await refreshPlugins();
+    return { status: 'error', message };
+  }
+}
+
+async function uninstallCurrent() {
+  const plugin = state.plugin;
+  if (!plugin) return;
+
+  try {
+    const result = await api.uninstallPlugin(plugin.id);
+    if (result.status === 'cancelled') return;
+    state.notice =
+      result.status === 'removed'
+        ? `已卸载：${result.id}`
+        : `卸载失败：${result.message || '未知错误'}`;
+  } catch (error) {
+    state.notice = `卸载失败：${String(error?.message || error)}`;
+  }
+
+  state.plugin = null;
+  state.run = null;
+  await refreshPlugins();
 }
 
 function canRun() {
@@ -137,7 +197,12 @@ function renderPlugin() {
   cancelButton.hidden = !running;
   cancelButton.addEventListener('click', cancelCurrent);
 
-  actions.append(runButton, cancelButton);
+  const uninstallButton = el('button', 'danger', '卸载插件');
+  uninstallButton.type = 'button';
+  uninstallButton.disabled = running;
+  uninstallButton.addEventListener('click', uninstallCurrent);
+
+  actions.append(runButton, cancelButton, uninstallButton);
   form.append(actions);
   root.append(form);
 
@@ -303,6 +368,38 @@ async function runSmokeCancel(inputPath) {
   return { status: state.run.status, error: state.run.error, progress: state.run.progress };
 }
 
+async function runSmokeInstall(zipPath) {
+  const result = await installZip(zipPath);
+  return {
+    status: result.status,
+    id: result.id ?? null,
+    message: result.message ?? null,
+    count: state.plugins.length,
+    present: Boolean(result.id) && state.plugins.some((plugin) => plugin.id === result.id),
+  };
+}
+
+async function runSmokeUninstall(id) {
+  const result = await api.uninstallPlugin(id);
+  await refreshPlugins();
+  return {
+    status: result.status,
+    id,
+    count: state.plugins.length,
+    present: state.plugins.some((plugin) => plugin.id === id),
+  };
+}
+
+function captureDetail(plugin) {
+  const manifest = plugin.manifest;
+  return {
+    name: manifest.name,
+    author: manifest.author.name,
+    version: manifest.version,
+    description: manifest.description,
+  };
+}
+
 async function main() {
   const { plugins, errors } = await api.listPlugins();
   state.plugins = plugins;
@@ -314,26 +411,33 @@ async function main() {
   let detail = null;
   let run = null;
 
-  if (smoke === 'detail' || smoke === 'run') {
-    const plugin = plugins[0];
-    if (plugin) {
-      openPlugin(plugin);
-      const manifest = plugin.manifest;
-      detail = {
-        name: manifest.name,
-        author: manifest.author.name,
-        version: manifest.version,
-        description: manifest.description,
-      };
+  if (smoke === 'detail') {
+    if (plugins[0]) {
+      openPlugin(plugins[0]);
+      detail = captureDetail(plugins[0]);
     }
   }
 
   if (smoke === 'run') {
+    // Full chain: install through the app IPC, then enter and run the plugin.
+    const zipPath = query.get('zip') || '';
+    if (zipPath && !state.plugins.some((plugin) => plugin.id === 'copy-image')) {
+      await installZip(zipPath);
+    }
+    const plugin = state.plugins.find((item) => item.id === 'copy-image') ?? state.plugins[0];
+    if (plugin) {
+      openPlugin(plugin);
+      detail = captureDetail(plugin);
+    }
     run = await runSmoke(query.get('input') || '');
   } else if (smoke === 'error') {
     run = await runSmokeError(query.get('input') || '');
   } else if (smoke === 'cancel') {
     run = await runSmokeCancel(query.get('input') || '');
+  } else if (smoke === 'install') {
+    run = await runSmokeInstall(query.get('zip') || '');
+  } else if (smoke === 'uninstall') {
+    run = await runSmokeUninstall('copy-image');
   }
 
   api.ready({ plugins: plugins.length, errors: errors.length, detail, run });

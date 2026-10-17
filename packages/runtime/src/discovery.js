@@ -22,6 +22,8 @@ export function discoverPlugins(pluginsDir) {
 
   for (const entry of entries) {
     if (!entry.isDirectory()) continue;
+    // Staging directories and other hidden entries are not plugins.
+    if (entry.name.startsWith('.')) continue;
     const dir = path.join(pluginsDir, entry.name);
     const manifestPath = path.join(dir, MANIFEST_FILE);
     if (!fs.existsSync(manifestPath)) continue;

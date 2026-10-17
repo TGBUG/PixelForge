@@ -32,6 +32,25 @@
       header h1 { margin: 0; font-size: 18px; font-weight: 600; }
       header p { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
       main { padding: 20px 24px; }
+      .toolbar { display: flex; gap: 10px; margin-bottom: 16px; }
+      .notice {
+        margin-bottom: 16px;
+        padding: 10px 12px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        background: var(--panel);
+      }
+      .danger {
+        margin-left: auto;
+        background: transparent;
+        border: 1px solid #6b2b2b;
+        border-radius: 6px;
+        color: #ef9a9a;
+        padding: 8px 14px;
+        font: inherit;
+        cursor: pointer;
+      }
+      .danger:hover:not(:disabled) { background: #2a1717; }
       .plugin-list { display: grid; gap: 10px; }
       .plugin {
         text-align: left;

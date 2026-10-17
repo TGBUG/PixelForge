@@ -2,18 +2,28 @@ import { app, BrowserWindow, dialog, ipcMain, nativeImage } from 'electron';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { discoverPlugins, removeWorkdir, runPlugin, saveOutputs } from '@pixelforge/runtime';
+import {
+  discoverPlugins,
+  installPlugin,
+  removeWorkdir,
+  runPlugin,
+  saveOutputs,
+  uninstallPlugin,
+} from '@pixelforge/runtime';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-// The shell reads plugins from the in-repo fixtures directory during development.
-// `PIXELFORGE_PLUGINS_DIR` overrides it (used by tests and, later, the installed
-// plugin directory).
+// Keep user data under `…/PixelForge` (the userData default would otherwise
+// follow the scoped npm package name).
+app.setName('PixelForge');
+
+// Installed plugins live under the user data directory. `PIXELFORGE_PLUGINS_DIR`
+// overrides it for tests and the smoke harness.
 function pluginsDir() {
   if (process.env.PIXELFORGE_PLUGINS_DIR) {
     return path.resolve(process.env.PIXELFORGE_PLUGINS_DIR);
   }
-  return path.resolve(__dirname, '..', '..', '..', 'fixtures', 'plugins');
+  return path.join(app.getPath('userData'), 'plugins');
 }
 
 // T8 will surface this in Settings; until then an env hook keeps it configurable.
@@ -32,6 +42,34 @@ async function discardFinishedRuns() {
 }
 
 ipcMain.handle('plugins:list', () => discoverPlugins(pluginsDir()));
+
+ipcMain.handle('dialog:pickZip', async (event) => {
+  const win = BrowserWindow.fromWebContents(event.sender);
+  const { canceled, filePaths } = await dialog.showOpenDialog(win, {
+    properties: ['openFile'],
+    filters: [{ name: '插件包', extensions: ['zip'] }],
+  });
+  return canceled ? null : filePaths[0];
+});
+
+ipcMain.handle('plugins:install', async (_event, { zipPath }) =>
+  installPlugin({ zipPath, pluginsDir: pluginsDir() }),
+);
+
+ipcMain.handle('plugins:uninstall', async (event, { id }) => {
+  if (!process.env.PIXELFORGE_SKIP_CONFIRM) {
+    const win = BrowserWindow.fromWebContents(event.sender);
+    const { response } = await dialog.showMessageBox(win, {
+      type: 'warning',
+      buttons: ['取消', '卸载'],
+      defaultId: 0,
+      cancelId: 0,
+      message: `确定卸载插件「${id}」吗？`,
+    });
+    if (response !== 1) return { status: 'cancelled' };
+  }
+  return uninstallPlugin({ pluginsDir: pluginsDir(), id });
+});
 
 ipcMain.handle('dialog:pickFile', async (event, { accept } = {}) => {
   const win = BrowserWindow.fromWebContents(event.sender);
@@ -151,7 +189,13 @@ function createWindow() {
   win.once('ready-to-show', () => win.show());
   const smoke = process.env.PIXELFORGE_SMOKE;
   win.loadFile(path.join(__dirname, 'renderer', 'index.html'), {
-    query: smoke ? { smoke, input: process.env.PIXELFORGE_SMOKE_INPUT || '' } : undefined,
+    query: smoke
+      ? {
+          smoke,
+          input: process.env.PIXELFORGE_SMOKE_INPUT || '',
+          zip: process.env.PIXELFORGE_SMOKE_ZIP || '',
+        }
+      : undefined,
   });
   return win;
 }

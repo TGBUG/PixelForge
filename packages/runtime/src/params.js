@@ -1,5 +1,15 @@
 import fs from 'node:fs';
 
+export const PARAM_TYPES = new Set([
+  'file',
+  'files',
+  'range',
+  'number',
+  'boolean',
+  'enum',
+  'string',
+]);
+
 // Resolves user-supplied values against a manifest's params: fills defaults,
 // requires missing required files, and enforces min/max. The full param
 // vocabulary and form generation arrive in T5; this is the run-time half.
