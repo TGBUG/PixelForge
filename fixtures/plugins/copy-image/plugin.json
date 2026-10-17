@@ -1,0 +1,19 @@
+{
+  "manifestVersion": 1,
+  "id": "copy-image",
+  "name": "Copy Image（示例·单输入）",
+  "version": "0.1.0",
+  "author": { "name": "PixelForge", "contact": "dev@pixelforge.local" },
+  "description": "夹具插件：读取选中的图片并原样写出，用于端到端验证子进程契约。",
+  "entry": "index.js",
+  "params": [
+    {
+      "key": "image",
+      "type": "file",
+      "label": "输入图片",
+      "description": "任意一张图片。",
+      "required": true,
+      "accept": [".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp"]
+    }
+  ]
+}

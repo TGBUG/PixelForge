@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'"
+      content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:"
     />
     <title>PixelForge</title>
     <style>
@@ -65,12 +65,87 @@
         cursor: pointer;
         font: inherit;
       }
-      .back:hover { color: var(--text); border-color: var(--accent); }
+      .back:hover:not(:disabled) { color: var(--text); border-color: var(--accent); }
+      button:disabled { opacity: 0.45; cursor: not-allowed; }
       .detail h2 { margin: 16px 0 4px; font-size: 20px; }
       dl { display: grid; grid-template-columns: 100px 1fr; gap: 6px 16px; margin: 18px 0 0; }
       dt { color: var(--muted); }
       dd { margin: 0; }
-      .note { margin-top: 24px; color: var(--muted); font-size: 12px; }
+      .note { margin: 8px 0 0; color: var(--muted); font-size: 12px; }
+      .form { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
+      .field { margin-bottom: 16px; }
+      .field label { display: block; font-weight: 600; margin-bottom: 4px; }
+      .field .desc { margin: 0 0 6px; color: var(--muted); font-size: 12px; }
+      .field-line { display: flex; gap: 10px; align-items: center; }
+      .path {
+        flex: 1;
+        padding: 8px 10px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        background: var(--panel);
+        color: var(--muted);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .actions { display: flex; gap: 10px; margin-top: 18px; }
+      button.primary, button.pick {
+        background: var(--accent);
+        border: 1px solid var(--accent);
+        border-radius: 6px;
+        color: #fff;
+        padding: 8px 16px;
+        font: inherit;
+        cursor: pointer;
+      }
+      button.primary:disabled {
+        background: #2f3542;
+        border-color: #2f3542;
+        color: var(--muted);
+        cursor: not-allowed;
+      }
+      button.pick { padding: 6px 12px; }
+      .progress-track {
+        height: 6px;
+        margin-top: 18px;
+        background: var(--panel);
+        border-radius: 3px;
+        overflow: hidden;
+      }
+      .progress-bar { height: 100%; width: 0; background: var(--accent); transition: width 0.15s; }
+      h3 { font-size: 13px; color: var(--muted); margin: 22px 0 8px; }
+      .log {
+        max-height: 140px;
+        overflow-y: auto;
+        background: #0f1115;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 8px 10px;
+        font-family: Consolas, monospace;
+        font-size: 12px;
+      }
+      .log-line { color: var(--muted); white-space: pre-wrap; }
+      .error {
+        margin-top: 16px;
+        padding: 10px 12px;
+        border: 1px solid #6b2b2b;
+        border-radius: 6px;
+        background: #2a1717;
+        color: #ef9a9a;
+        white-space: pre-wrap;
+      }
+      .saved { margin-top: 12px; color: #8fd18f; font-size: 12px; }
+      .preview { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
+      .preview-item { margin: 0 0 16px; }
+      .preview-item img {
+        max-width: 100%;
+        max-height: 320px;
+        image-rendering: pixelated;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        background: #0f1115;
+      }
+      .preview-item figcaption { color: var(--muted); font-size: 12px; margin-top: 6px; }
     </style>
   </head>
   <body>

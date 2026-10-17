@@ -1,0 +1,12 @@
+{
+  "manifestVersion": 1,
+  "id": "fixture-exit-silently",
+  "name": "Fixture Exit Silently（无 result 即退出）",
+  "version": "0.0.1",
+  "author": { "name": "PixelForge", "contact": "dev@pixelforge.local" },
+  "description": "测试夹具：正常退出但从不发送 result。",
+  "entry": "index.js",
+  "params": [
+    { "key": "image", "type": "file", "label": "输入图片", "required": true, "accept": [".png", ".jpg"] }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "manifestVersion": 1,
+  "id": "fixture-hang",
+  "name": "Fixture Hang（必定挂起）",
+  "version": "0.0.1",
+  "author": { "name": "PixelForge", "contact": "dev@pixelforge.local" },
+  "description": "测试夹具：永不返回，用于验证取消与超时。",
+  "entry": "index.js",
+  "params": [
+    { "key": "image", "type": "file", "label": "输入图片", "required": true, "accept": [".png", ".jpg"] }
+  ]
+}

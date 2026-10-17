@@ -1,0 +1,12 @@
+{
+  "manifestVersion": 1,
+  "id": "fixture-fail",
+  "name": "Fixture Fail（必定失败）",
+  "version": "0.0.1",
+  "author": { "name": "PixelForge", "contact": "dev@pixelforge.local" },
+  "description": "测试夹具：run() 抛出异常，用于验证错误上报。",
+  "entry": "index.js",
+  "params": [
+    { "key": "image", "type": "file", "label": "输入图片", "required": true, "accept": [".png", ".jpg"] }
+  ]
+}

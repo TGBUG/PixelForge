@@ -1,0 +1,12 @@
+{
+  "manifestVersion": 1,
+  "id": "fixture-spawn-child",
+  "name": "Fixture Spawn Child（拉起子进程后挂起）",
+  "version": "0.0.1",
+  "author": { "name": "PixelForge", "contact": "dev@pixelforge.local" },
+  "description": "测试夹具：拉起一个子进程后挂起，用于验证取消会杀进程树。",
+  "entry": "index.js",
+  "params": [
+    { "key": "image", "type": "file", "label": "输入图片", "required": true, "accept": [".png", ".jpg"] }
+  ]
+}
